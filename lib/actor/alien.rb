@@ -1,19 +1,20 @@
 module Actor
   class Alien < Base
-    attr_accessor :image, :true_img, :cannon_timer
+    attr_accessor :cannon_timer
+
+    CANNON_DELAY = 300
 
     def initialize(*argv)
       super(*argv)
+      self.image ||= window.tilesheet[1]
 
-      @cannon_timer = 0
-      @image = window.tilesheet[1]
-      @true_img = @image
+      @cannon_timer = CANNON_DELAY
     end
 
     def draw
-      if image == window.tilesheet[2]
-        pos_x = x + [*-2..2].sample
-        pos_y = y + [*-2..2].sample
+      if alarmed?
+        pos_x = x + rand(-2..2)
+        pos_y = y + rand(-2..2)
       else
         pos_x = x
         pos_y = y
@@ -23,16 +24,17 @@ module Actor
     end
 
     def update
-      self.cannon_timer -= 1 * window.level
+      self.cannon_timer -= rand(0..window.level)
 
       return unless cannon_timer <= 0
 
       shoot
-      self.cannon_timer += 1_000
+
+      self.cannon_timer += CANNON_DELAY
     end
 
     def shoot
-      return unless image == window.tilesheet[2]
+      return unless alarmed?
 
       window.actors.push Bullet.new(
         window,
@@ -43,7 +45,7 @@ module Actor
         5,
         direction: :down,
         enemy: Player,
-        tile: 2
+        image: image
       )
     end
 
@@ -62,6 +64,10 @@ module Actor
       nx = x + speed * velocity
 
       nx + width < window.width && x > 1
+    end
+
+    def alarmed?
+      state == :alarmed
     end
   end
 end

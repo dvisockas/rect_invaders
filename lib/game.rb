@@ -4,11 +4,11 @@ class Game < Gosu::Window
   def initialize
     super(1024, 768, false)
     self.caption = 'Rect. Invaders'
+    @score = @level = 0
 
     @player = Actor::Player.new(self, 500, 700, 21, 21, 5)
 
-    @text  = Gosu::Font.new(self, Gosu::default_font_name, 20)
-    @score = @level = 0
+    @text = Gosu::Font.new(self, Gosu::default_font_name, 20)
 
     new_level
   end
@@ -22,7 +22,7 @@ class Game < Gosu::Window
   def new_level
     self.level += 1
 
-    player.image = tilesheet[0]
+    player.state = nil
     self.actors  = [player]
 
     populate_aliens
@@ -31,9 +31,22 @@ class Game < Gosu::Window
   def populate_aliens
     5.times do |row|
       11.times do |col|
-        @actors << Actor::Alien.new(self, 200 + 70 * col, 50 + 70 * row, 21, 21, 2)
+        new_alien(row, col, row == 4 && (col % 2).zero?)
       end
     end
+  end
+
+  def new_alien(row, col, alarmed)
+    @actors.push(Actor::Alien.new(
+        self,
+        200 + 70 * col,
+        50 + 70 * row,
+        21,
+        21,
+        2,
+        state: (:alarmed if alarmed)
+      )
+    )
   end
 
   def animate_aliens
@@ -49,7 +62,7 @@ class Game < Gosu::Window
   end
 
   def tilesheet
-    @tilesheet ||= Gosu::Image::load_tiles(self, 'tiles.png', 1, 1, false)
+    @tilesheet ||= Gosu::Image::load_tiles(self, 'palette.png', 1, 1, false)
   end
 
   def update
@@ -110,14 +123,14 @@ class Game < Gosu::Window
     if bullet.x_bound(target.x, target.width) &&
        bullet.y_bound(target.y, target.height)
 
-      if target.true_img == bullet.image
-        target.image = bullet.image
-      elsif target.image == tilesheet[2] or bullet.class == target.class
+      return if bullet == target
+
+      if target.state == :alarmed
         self.score += (100.0 / target.width * level).to_i
 
         actors.delete(target)
       else
-        target.image = tilesheet[2]
+        target.state = :alarmed
       end
 
       actors.delete(bullet)
@@ -125,13 +138,12 @@ class Game < Gosu::Window
   end
 
   def big_status_text(smth, subtext = nil)
-    horizontal  = width / 2 - smth.size * 25
-    vertical    = height / 2 - 50
-    opts = [999, 5, 5, Gosu::Color::WHITE]
+    horizontal = width / 2 - smth.size * 25
+    vertical   = height / 2 - 100
+    color      = Gosu::Color::WHITE
 
-    @text.draw(smth, horizontal, vertical, *opts)
-    opts[1, 2] = 2, 2
-    @text.draw(subtext, horizontal, vertical + 100, *opts)
+    @text.draw(smth, horizontal, vertical, 9, 5, 5, color)
+    @text.draw(subtext, horizontal, vertical + 100, 9, 2, 2, color) if subtext
   end
 
   def game_over?

@@ -1,17 +1,15 @@
 module Actor
   class Bullet < Base
-    attr_accessor :direction, :image, :enemy, :true_img
+    attr_accessor :direction, :enemy
 
     GRAVITY = { up: 1, down: -1 }
 
     def initialize(*argv)
       super(*argv)
+      self.image ||= window.tilesheet[2]
 
       @direction = opts[:direction]
       @enemy     = opts[:enemy]
-
-      @image    = window.tilesheet[opts[:tile]]
-      @true_img = @image
     end
 
     def draw
@@ -20,7 +18,7 @@ module Actor
 
     def update
       self.y -= speed * GRAVITY[direction]
-      self.x += [*-1..1].sample
+      self.x += rand(-1..1)
 
       window.actors.delete(self) if y < 0 or y > window.height
       window.actors.each do |target|

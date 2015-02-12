@@ -1,17 +1,13 @@
 module Actor
   class Player < Base
-    attr_reader :true_img
-    attr_accessor :image
 
     def initialize(*arg)
       super(*arg)
-
-      @image  = window.tilesheet[0]
-      @true_img = @image
+      self.image ||= window.tilesheet[0]
     end
 
     def draw
-      @image.draw(x, y, 100, width, height)
+      image.draw(x, y, 100, width, height)
     end
 
     def update
@@ -29,7 +25,7 @@ module Actor
         5,
         direction: :up,
         enemy: Alien,
-        tile: 0
+        image: image
       )
     end
 
