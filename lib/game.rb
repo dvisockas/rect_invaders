@@ -29,20 +29,34 @@ class Game < Gosu::Window
   end
 
   def populate_aliens
-    5.times do |row|
-      11.times do |col|
-        new_alien(row, col, row == 4 && (col % 2).zero?)
+    file = File.readlines(Dir.glob('swarms/*').sample)
+
+    default_size = 25
+    max_size = (width / (file.max.size + file.max.size/1.5 + 10))
+
+    size = [default_size, max_size].min
+
+    file.each_with_index do |line, row|
+      line.chomp.each_char.each_with_index do |c, col|
+        next if c.eql?(' ')
+
+        new_alien(
+          row,
+          col,
+          size,
+          row == file.size - 1,
+        )
       end
     end
   end
 
-  def new_alien(row, col, alarmed)
+  def new_alien(row, col, size, alarmed)
     @actors.push(Actor::Alien.new(
         self,
-        200 + 70 * col,
-        50 + 70 * row,
-        21,
-        21,
+        10 + (size+size/1.5) * col,
+        50 + (size+size/1.5) * row,
+        size,
+        size,
         2,
         state: (:alarmed if alarmed)
       )
@@ -126,7 +140,7 @@ class Game < Gosu::Window
       return if bullet == target
 
       if target.state == :alarmed
-        self.score += (100.0 / target.width * level).to_i
+        self.score += (level * 100.0 / target.width * 2).to_i
 
         target.explode
 
