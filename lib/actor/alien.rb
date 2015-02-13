@@ -1,6 +1,6 @@
 module Actor
   class Alien < Base
-    attr_accessor :cannon_timer
+    attr_accessor :cannon_timer, :velocity
 
     CANNON_DELAY = 300
 
@@ -8,6 +8,7 @@ module Actor
       super(*argv)
       self.image ||= window.tilesheet[1]
 
+      @velocity = 1
       @cannon_timer = CANNON_DELAY
     end
 
@@ -47,6 +48,8 @@ module Actor
         enemy: Player,
         image: image
       )
+
+      Sample.play(:laser_tiny)
     end
 
     def bounce

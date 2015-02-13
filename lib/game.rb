@@ -120,7 +120,7 @@ class Game < Gosu::Window
   end
 
   def collision_check(target, bullet)
-    if bullet.x_bound(target.x, target.width) &&
+    if bullet.x_bound(target.x, target.width) and
        bullet.y_bound(target.y, target.height)
 
       return if bullet == target
@@ -128,9 +128,14 @@ class Game < Gosu::Window
       if target.state == :alarmed
         self.score += (100.0 / target.width * level).to_i
 
-        actors.delete(target)
+        target.explode
+
+        Thread.new do
+          sleep 1
+          target.implode
+        end
       else
-        target.state = :alarmed
+        target.hit
       end
 
       actors.delete(bullet)

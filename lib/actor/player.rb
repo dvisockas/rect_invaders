@@ -1,6 +1,5 @@
 module Actor
   class Player < Base
-
     def initialize(*arg)
       super(*arg)
       self.image ||= window.tilesheet[0]
@@ -27,6 +26,8 @@ module Actor
         enemy: Alien,
         image: image
       )
+
+      Sample.play(:laser_med)
     end
 
     def move_right
@@ -35,6 +36,10 @@ module Actor
 
     def move_left
       self.x = [x - speed, 1].max
+    end
+
+    def explode
+      Sample.play(:explode_big)
     end
   end
 end

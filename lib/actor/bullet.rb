@@ -28,6 +28,10 @@ module Actor
       end
     end
 
+    def explosion
+      Sample.play(:tink)
+    end
+
     def y_bound(t_y, t_height)
       [y, y + height].any? { |yy| yy.between?(t_y, t_y + t_height) }
     end
