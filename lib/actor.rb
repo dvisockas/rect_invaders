@@ -30,8 +30,8 @@ module Actor
 
       self.x -= zone_size
       self.y -= zone_size
-      self.width += zone_size*2
-      self.height += zone_size*2
+      self.width += zone_size * 2
+      self.height += zone_size * 2
     end
 
     def implode

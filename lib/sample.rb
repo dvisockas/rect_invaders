@@ -1,15 +1,11 @@
 class Sample
-  class << self
-    def samples
-      @@samples ||= Dir.glob('audio/*.wav').each_with_object({}) do |sample, list|
-        key = sample.match('audio/(.*).wav')[1].intern
+  SAMPLES = Dir.glob('audio/*.wav').each_with_object({}) do |sample, list|
+    key = sample.match('audio/(.*).wav')[1].intern
 
-        list[key] = Gosu::Sample.new(sample)
-      end
-    end
+    list[key] = Gosu::Sample.new(sample)
+  end
 
-    def play(key)
-      samples[key].play
-    end
+  def self.play(key)
+    SAMPLES[key].play
   end
 end

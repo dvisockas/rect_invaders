@@ -29,38 +29,7 @@ class Game < Gosu::Window
   end
 
   def populate_aliens
-    file = File.readlines(Dir.glob('swarms/*').sample)
-
-    default_size = 25
-    max_size = (width / (file.max.size + file.max.size/1.5 + 10))
-
-    size = [default_size, max_size].min
-
-    file.each_with_index do |line, row|
-      line.chomp.each_char.each_with_index do |c, col|
-        next if c.eql?(' ')
-
-        new_alien(
-          row,
-          col,
-          size,
-          row == file.size - 1,
-        )
-      end
-    end
-  end
-
-  def new_alien(row, col, size, alarmed)
-    @actors.push(Actor::Alien.new(
-        self,
-        10 + (size+size/1.5) * col,
-        50 + (size+size/1.5) * row,
-        size,
-        size,
-        2,
-        state: (:alarmed if alarmed)
-      )
-    )
+    Swarm.new(self).spawn
   end
 
   def animate_aliens
@@ -99,7 +68,7 @@ class Game < Gosu::Window
       actors.each(&:draw)
     end
 
-    big_status_text("PAUSE") if pause
+    big_status_text('PAUSE') if pause
   end
 
   def button_down(id)
@@ -133,6 +102,7 @@ class Game < Gosu::Window
     @text.draw(text, 10, 10, 999, 1.5, 1.5, Gosu::Color::WHITE)
   end
 
+  # TODO: extract to separate class
   def collision_check(target, bullet)
     if bullet.x_bound(target.x, target.width) and
        bullet.y_bound(target.y, target.height)

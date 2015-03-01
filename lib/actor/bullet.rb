@@ -20,7 +20,7 @@ module Actor
       self.y -= speed * GRAVITY[direction]
       self.x += rand(-1..1)
 
-      window.actors.delete(self) if y < 0 or y > window.height
+      window.actors.delete(self) if y < 0 || y > window.height
       window.actors.each do |target|
         next if target.equal?(self)
 
